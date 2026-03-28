@@ -1,0 +1,6 @@
+analyzers:
+  disable:
+    - mixedcaps # disable mixedcaps analyzer. because the underscores analyzer is more detailed.
+analyzers-settings:
+  errorstrings:
+    exclude-test: true
