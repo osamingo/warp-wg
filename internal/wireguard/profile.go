@@ -19,27 +19,32 @@ AllowedIPs = {{ .AllowedIPs }}
 Endpoint = {{ .PeerEndpoint }}
 PersistentKeepalive = 25
 {{- if .Reserved }}
-# Reserved = {{ .Reserved }}
+{{ .ReservedPrefix }}Reserved = {{ .Reserved }}
+{{- if not .ReservedActive }}
 # Cloudflare client_id for load balancing (used by Xray-core, sing-box, etc.)
+{{- end }}
 {{- end }}
 `))
 
 // ProfileData holds the values for the WireGuard profile template.
 type ProfileData struct {
-	PrivateKey    string
-	Address       string
-	DNS           string
-	MTU           int
-	AllowedIPs    string
-	PeerPublicKey string
-	PeerEndpoint  string
-	Reserved      string
+	PrivateKey     string
+	Address        string
+	DNS            string
+	MTU            int
+	AllowedIPs     string
+	PeerPublicKey  string
+	PeerEndpoint   string
+	Reserved       string
+	ReservedPrefix string
+	ReservedActive bool
 }
 
 // ProfileOptions controls the profile generation behavior.
 type ProfileOptions struct {
-	NoIPv6 bool
-	MTU    int
+	NoIPv6   bool
+	MTU      int
+	Reserved bool
 }
 
 // NewProfileData builds ProfileData from raw API values and options.
@@ -54,15 +59,22 @@ func NewProfileData(privKey, addrV4, addrV6, peerPubKey, peerEndpoint, reserved 
 		allowedIPs += ", ::/0"
 	}
 
+	reservedPrefix := "# "
+	if opts.Reserved {
+		reservedPrefix = ""
+	}
+
 	return &ProfileData{
-		PrivateKey:    privKey,
-		Address:       address,
-		DNS:           dns,
-		MTU:           opts.MTU,
-		AllowedIPs:    allowedIPs,
-		PeerPublicKey: peerPubKey,
-		PeerEndpoint:  peerEndpoint,
-		Reserved:      reserved,
+		PrivateKey:     privKey,
+		Address:        address,
+		DNS:            dns,
+		MTU:            opts.MTU,
+		AllowedIPs:     allowedIPs,
+		PeerPublicKey:  peerPubKey,
+		PeerEndpoint:   peerEndpoint,
+		Reserved:       reserved,
+		ReservedPrefix: reservedPrefix,
+		ReservedActive: opts.Reserved,
 	}
 }
 

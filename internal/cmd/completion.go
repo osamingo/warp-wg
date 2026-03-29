@@ -85,7 +85,7 @@ const bashCompletion = `_warp_wg() {
             esac
             ;;
         profile)
-            COMPREPLY=($(compgen -W "--no-ipv6 --endpoint-ip --mtu --port --help" -- "$cur"))
+            COMPREPLY=($(compgen -W "--no-ipv6 --endpoint-ip --reserved --mtu --port --help" -- "$cur"))
             return
             ;;
         completion)
@@ -176,6 +176,7 @@ _warp_wg() {
                     _arguments \
                         '--no-ipv6[Exclude IPv6 addresses and DNS]' \
                         '--endpoint-ip[Use IP address instead of hostname]' \
+                        '--reserved[Output Reserved field as active directive]' \
                         '--mtu[MTU value]:mtu:' \
                         '--port[Endpoint port]:port:'
                     ;;
@@ -230,6 +231,7 @@ complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_see
 # profile flags
 complete -c warp-wg -n '__fish_seen_subcommand_from profile' -l no-ipv6 -d 'Exclude IPv6 addresses and DNS'
 complete -c warp-wg -n '__fish_seen_subcommand_from profile' -l endpoint-ip -d 'Use IP address instead of hostname'
+complete -c warp-wg -n '__fish_seen_subcommand_from profile' -l reserved -d 'Output Reserved field as active directive'
 complete -c warp-wg -n '__fish_seen_subcommand_from profile' -l mtu -d 'MTU value' -r
 complete -c warp-wg -n '__fish_seen_subcommand_from profile' -l port -d 'Endpoint port' -r
 
