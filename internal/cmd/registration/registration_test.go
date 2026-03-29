@@ -2,12 +2,18 @@ package registration_test
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/osamingo/warp-wg/internal/cmd/registration"
+	"github.com/osamingo/warp-wg/internal/config"
 	"github.com/osamingo/warp-wg/internal/warp"
 )
 
@@ -221,6 +227,168 @@ func TestPrintDevice(t *testing.T) {
 
 			if diff := cmp.Diff(tt.want, buf.String()); diff != "" {
 				t.Errorf("PrintDevice() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func setupTestContext(t *testing.T, handler http.HandlerFunc) context.Context {
+	t.Helper()
+
+	srv := httptest.NewServer(handler)
+	t.Cleanup(srv.Close)
+
+	dir := t.TempDir()
+	ctx := context.Background()
+	ctx = config.WithPath(ctx, filepath.Join(dir, "account.toml"))
+	ctx = warp.WithAPIBaseURL(ctx, srv.URL)
+
+	acct := &config.Account{
+		DeviceID:    "device-123",
+		AccessToken: "token",
+		PrivateKey:  "key",
+	}
+	if err := config.Save(ctx, acct); err != nil {
+		t.Fatalf("Save() error = %v", err)
+	}
+
+	return ctx
+}
+
+func deviceHandler(t *testing.T) http.HandlerFunc {
+	t.Helper()
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": "device-123",
+			"account": map[string]any{
+				"account_type": "free",
+				"premium_data": 0,
+				"quota":        0,
+				"created":      "2026-03-29T00:00:00Z",
+				"updated":      "2026-03-29T00:00:00Z",
+			},
+			"config": map[string]any{
+				"interface": map[string]any{
+					"addresses": map[string]string{"v4": "172.16.0.2", "v6": "fd01::1"},
+				},
+				"peers": []map[string]any{{
+					"public_key": "server-pub-key",
+					"endpoint":   map[string]string{"host": "engage.cloudflareclient.com:2408", "v4": "162.159.192.1:0"},
+				}},
+			},
+		})
+	}
+}
+
+func TestExecShow(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		jsonOut bool
+		contain string
+	}{
+		{
+			name:    "success: text output",
+			jsonOut: false,
+			contain: "Device ID:    device-123",
+		},
+		{
+			name:    "success: json output",
+			jsonOut: true,
+			contain: `"id": "device-123"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx := setupTestContext(t, deviceHandler(t))
+
+			var buf bytes.Buffer
+			err := registration.ExecShow(ctx, &buf, tt.jsonOut)
+			if err != nil {
+				t.Fatalf("ExecShow() error = %v", err)
+			}
+
+			if !strings.Contains(buf.String(), tt.contain) {
+				t.Errorf("ExecShow() should contain %q, got:\n%s", tt.contain, buf.String())
+			}
+		})
+	}
+}
+
+func TestExecDevices(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		handler http.HandlerFunc
+		jsonOut bool
+		contain string
+	}{
+		{
+			name: "success: text output with devices",
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				if strings.Contains(r.URL.Path, "/account/devices") {
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode([]map[string]any{
+						{"id": "dev-1", "name": "Phone", "active": true, "model": "Android"},
+						{"id": "dev-2", "name": "PC", "active": false, "model": "PC"},
+					})
+					return
+				}
+				deviceHandler(t)(w, r)
+			},
+			jsonOut: false,
+			contain: "Phone",
+		},
+		{
+			name: "success: json output",
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				if strings.Contains(r.URL.Path, "/account/devices") {
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode([]map[string]any{
+						{"id": "dev-1", "name": "Phone", "active": true},
+					})
+					return
+				}
+				deviceHandler(t)(w, r)
+			},
+			jsonOut: true,
+			contain: `"id": "dev-1"`,
+		},
+		{
+			name: "success: empty devices",
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				if strings.Contains(r.URL.Path, "/account/devices") {
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode([]map[string]any{})
+					return
+				}
+				deviceHandler(t)(w, r)
+			},
+			jsonOut: false,
+			contain: "No devices found.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx := setupTestContext(t, tt.handler)
+
+			var buf bytes.Buffer
+			err := registration.ExecDevices(ctx, &buf, tt.jsonOut)
+			if err != nil {
+				t.Fatalf("ExecDevices() error = %v", err)
+			}
+
+			if !strings.Contains(buf.String(), tt.contain) {
+				t.Errorf("ExecDevices() should contain %q, got:\n%s", tt.contain, buf.String())
 			}
 		})
 	}
