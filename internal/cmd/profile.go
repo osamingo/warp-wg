@@ -21,12 +21,13 @@ func newProfileCmd() *ff.Command {
 	flags := ff.NewFlagSet("profile")
 	noIPv6 := flags.Bool(0, "no-ipv6", "Exclude IPv6 addresses and DNS")
 	useIP := flags.Bool(0, "endpoint-ip", "Use IP address instead of hostname for endpoint")
+	reserved := flags.Bool(0, "reserved", "Output Reserved field as active directive instead of comment")
 	mtu := flags.IntLong("mtu", 1420, "MTU value (default: 1420, use 1280 for maximum compatibility)")
 	port := flags.StringLong("port", defaultWARPPort, "Endpoint port (default: 2408)")
 
 	return &ff.Command{
 		Name:      "profile",
-		Usage:     "warp-wg profile [--no-ipv6] [--endpoint-ip] [--mtu N] [--port N]",
+		Usage:     "warp-wg profile [--no-ipv6] [--endpoint-ip] [--reserved] [--mtu N] [--port N]",
 		ShortHelp: "Output WireGuard profile to stdout",
 		Flags:     flags,
 		Exec: func(ctx context.Context, _ []string) error {
@@ -37,20 +38,22 @@ func newProfileCmd() *ff.Command {
 				return fmt.Errorf("invalid port: %s (must be between 1 and 65535)", *port)
 			}
 			return execProfile(ctx, os.Stdout, profileFlags{
-				noIPv6: *noIPv6,
-				useIP:  *useIP,
-				mtu:    *mtu,
-				port:   *port,
+				noIPv6:   *noIPv6,
+				useIP:    *useIP,
+				reserved: *reserved,
+				mtu:      *mtu,
+				port:     *port,
 			})
 		},
 	}
 }
 
 type profileFlags struct {
-	noIPv6 bool
-	useIP  bool
-	mtu    int
-	port   string
+	noIPv6   bool
+	useIP    bool
+	reserved bool
+	mtu      int
+	port     string
 }
 
 func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
@@ -90,7 +93,7 @@ func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
 		peer.PublicKey,
 		endpoint,
 		reserved,
-		wireguard.ProfileOptions{NoIPv6: pf.noIPv6, MTU: pf.mtu},
+		wireguard.ProfileOptions{NoIPv6: pf.noIPv6, MTU: pf.mtu, Reserved: pf.reserved},
 	)
 
 	return wireguard.WriteProfile(out, data)
