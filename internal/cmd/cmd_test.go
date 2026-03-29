@@ -214,10 +214,10 @@ func TestExecProfile(t *testing.T) {
 			ctx = config.WithPath(ctx, filepath.Join(dir, "account.toml"))
 			ctx = warp.WithAPIBaseURL(ctx, srv.URL)
 
-			acct := &config.Account{
-				DeviceID:    "device-123",
-				AccessToken: "token",
-				PrivateKey:  "YAnezg1qdTdRLGL7F+FPBnEuIc/6vmNPiPxP0GG2GA0=",
+			acct := &config.Registration{
+				RegistrationID: "device-123",
+				APIToken:       "token",
+				PrivateKey:     "YAnezg1qdTdRLGL7F+FPBnEuIc/6vmNPiPxP0GG2GA0=",
 			}
 			if err := config.Save(ctx, acct); err != nil {
 				t.Fatalf("Save() error = %v", err)

@@ -31,13 +31,13 @@ func NewUpdateCmd(parentFlags *ff.FlagSet) *ff.Command {
 }
 
 func execUpdate(ctx context.Context, name string) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	if _, err := client.UpdateDeviceKey(ctx, acct.DeviceID, acct.AccessToken, &warp.UpdateDeviceRequest{
+	if _, err := client.UpdateDeviceKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateDeviceRequest{
 		Name: name,
 	}); err != nil {
 		return fmt.Errorf("updating device: %w", err)

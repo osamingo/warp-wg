@@ -66,14 +66,14 @@ warp-wg completion fish > ~/.config/fish/completions/warp-wg.fish  # persistent
 
 ## Configuration
 
-Credentials are stored in `~/.config/warp-wg/account.toml` ([XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/latest/)) with `0600` permissions. The WireGuard private key is generated locally and never sent to the server.
+Credentials are stored in `~/.config/warp-wg/reg.json` ([XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/latest/)) with `0600` permissions. The WireGuard private key is generated locally and never sent to the server.
 
 Environment variable overrides:
 
 | Variable | Description |
 |----------|-------------|
-| `WARP_WG_DEVICE_ID` | Device ID |
-| `WARP_WG_ACCESS_TOKEN` | API access token |
+| `WARP_WG_REGISTRATION_ID` | Registration ID |
+| `WARP_WG_API_TOKEN` | API token |
 | `WARP_WG_PRIVATE_KEY` | WireGuard private key |
 
 ## WARP+

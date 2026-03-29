@@ -67,12 +67,12 @@ func promptTOS(in io.Reader, out io.Writer) error {
 }
 
 func execNew(ctx context.Context) error {
-	acct, err := config.Load(ctx)
+	reg, err := config.Load(ctx)
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
 	}
-	if acct.DeviceID != "" {
-		return fmt.Errorf("already registered (device_id: %s), delete the config file to re-register", acct.DeviceID)
+	if reg.RegistrationID != "" {
+		return fmt.Errorf("already registered (registration_id: %s), delete the config file to re-register", reg.RegistrationID)
 	}
 
 	privKey, err := wireguard.GeneratePrivateKey()
@@ -101,22 +101,22 @@ func execNew(ctx context.Context) error {
 		return fmt.Errorf("registering device: %w", err)
 	}
 
-	acct = &config.Account{
-		DeviceID:    resp.ID,
-		AccessToken: resp.Token,
-		PrivateKey:  privKey.String(),
+	reg = &config.Registration{
+		RegistrationID: resp.ID,
+		APIToken:       resp.Token,
+		PrivateKey:     privKey.String(),
 	}
-	if err := config.Save(ctx, acct); err != nil {
+	if err := config.Save(ctx, reg); err != nil {
 		slog.Error("failed to save config, manually save the following credentials",
-			slog.String("device_id", resp.ID),
-			slog.String("access_token", resp.Token),
+			slog.String("registration_id", resp.ID),
+			slog.String("api_token", resp.Token),
 			slog.String("private_key", privKey.String()),
 		)
 		return fmt.Errorf("saving config: %w", err)
 	}
 
 	slog.Info("registration successful",
-		slog.String("device_id", resp.ID),
+		slog.String("registration_id", resp.ID),
 		slog.String("account_type", resp.Account.AccountType),
 	)
 

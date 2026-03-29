@@ -60,7 +60,7 @@ func confirmRotateKeys(in io.Reader, out io.Writer) error {
 }
 
 func execRotateKeys(ctx context.Context) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
@@ -78,14 +78,14 @@ func execRotateKeys(ctx context.Context) error {
 	slog.Info("rotating WireGuard keys")
 
 	client := warp.NewClientFromContext(ctx)
-	if _, err := client.UpdateDeviceKey(ctx, acct.DeviceID, acct.AccessToken, &warp.UpdateDeviceRequest{
+	if _, err := client.UpdateDeviceKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateDeviceRequest{
 		Key: pubKey.String(),
 	}); err != nil {
 		return fmt.Errorf("updating device key: %w", err)
 	}
 
-	acct.PrivateKey = privKey.String()
-	if err := config.Save(ctx, acct); err != nil {
+	reg.PrivateKey = privKey.String()
+	if err := config.Save(ctx, reg); err != nil {
 		slog.Error("failed to save config, manually save the following credentials",
 			slog.String("private_key", privKey.String()),
 		)

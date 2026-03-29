@@ -30,13 +30,13 @@ func NewLicenseCmd(parentFlags *ff.FlagSet) *ff.Command {
 }
 
 func execLicense(ctx context.Context, licenseKey string) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	resp, err := client.UpdateAccount(ctx, acct.DeviceID, acct.AccessToken, &warp.UpdateAccountRequest{
+	resp, err := client.UpdateAccount(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateAccountRequest{
 		License: licenseKey,
 	})
 	if err != nil {

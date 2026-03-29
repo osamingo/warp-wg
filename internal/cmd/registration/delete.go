@@ -61,15 +61,15 @@ func confirmDelete(in io.Reader, out io.Writer) error {
 }
 
 func execDelete(ctx context.Context) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
-	slog.Info("deleting device registration", slog.String("device_id", acct.DeviceID))
+	slog.Info("deleting device registration", slog.String("registration_id", reg.RegistrationID))
 
 	client := warp.NewClientFromContext(ctx)
-	if err := client.DeleteDevice(ctx, acct.DeviceID, acct.AccessToken); err != nil {
+	if err := client.DeleteDevice(ctx, reg.RegistrationID, reg.APIToken); err != nil {
 		return fmt.Errorf("deleting device: %w", err)
 	}
 

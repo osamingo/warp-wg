@@ -57,13 +57,13 @@ type profileFlags struct {
 }
 
 func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	device, err := client.Device(ctx, acct.DeviceID, acct.AccessToken)
+	device, err := client.Device(ctx, reg.RegistrationID, reg.APIToken)
 	if err != nil {
 		return fmt.Errorf("fetching device info: %w", err)
 	}
@@ -87,7 +87,7 @@ func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
 	}
 
 	data := wireguard.NewProfileData(
-		acct.PrivateKey,
+		reg.PrivateKey,
 		device.Config.Interface.Addresses.V4,
 		device.Config.Interface.Addresses.V6,
 		peer.PublicKey,

@@ -30,13 +30,13 @@ func NewDevicesCmd(parentFlags *ff.FlagSet) *ff.Command {
 }
 
 func execDevices(ctx context.Context, out io.Writer, jsonOut bool) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	devices, err := client.BoundDevices(ctx, acct.DeviceID, acct.AccessToken)
+	devices, err := client.BoundDevices(ctx, reg.RegistrationID, reg.APIToken)
 	if err != nil {
 		return fmt.Errorf("fetching devices: %w", err)
 	}
