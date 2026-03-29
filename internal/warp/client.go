@@ -14,9 +14,9 @@ import (
 
 const (
 	defaultBaseURL  = "https://api.cloudflareclient.com"
-	apiVersion      = "v0a2158"
-	userAgent       = "okhttp/0.7.21"
-	cfClientVersion = "a-7.21-0721"
+	apiVersion      = "v0a5101"
+	userAgent       = "okhttp/4.12.0"
+	cfClientVersion = "a-6.38.6-5101"
 
 	maxResponseSize = 1 << 20 // 1 MB
 )
@@ -68,13 +68,13 @@ func NewClientFromContext(ctx context.Context) *Client {
 
 // RegisterRequest is the request body for POST /reg.
 type RegisterRequest struct {
-	Key       string `json:"key"`
-	InstallID string `json:"install_id"`
-	FcmToken  string `json:"fcm_token"`
-	TOS       string `json:"tos"`
-	Model     string `json:"model"`
-	Type      string `json:"type"`
-	Locale    string `json:"locale"`
+	Key          string `json:"key"`
+	InstallID    string `json:"install_id"`
+	FcmToken     string `json:"fcm_token"`
+	TOS          string `json:"tos"`
+	Model        string `json:"model,omitempty"`
+	SerialNumber string `json:"serial_number"`
+	Locale       string `json:"locale"`
 }
 
 // RegisterResponse is the response from POST /reg.

@@ -89,13 +89,13 @@ func execNew(ctx context.Context) error {
 
 	client := warp.NewClientFromContext(ctx)
 	resp, err := client.Register(ctx, &warp.RegisterRequest{
-		Key:       pubKey.String(),
-		InstallID: "",
-		FcmToken:  "",
-		TOS:       time.Now().UTC().Format(time.RFC3339),
-		Model:     "PC",
-		Type:      "Android", // Required by the WARP API; mimics the official Android client.
-		Locale:    systemLocale(),
+		Key:          pubKey.String(),
+		InstallID:    "",
+		FcmToken:     "",
+		TOS:          time.Now().UTC().Format(time.RFC3339),
+		Model:        "PC",
+		SerialNumber: "",
+		Locale:       systemLocale(),
 	})
 	if err != nil {
 		return fmt.Errorf("registering device: %w", err)
