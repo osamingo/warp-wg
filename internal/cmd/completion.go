@@ -74,7 +74,11 @@ const bashCompletion = `_warp_wg() {
                     COMPREPLY=($(compgen -W "--name --help" -- "$cur"))
                     return
                     ;;
-                license|rotate-keys)
+                rotate-keys)
+                    COMPREPLY=($(compgen -W "--quiet -q --help" -- "$cur"))
+                    return
+                    ;;
+                license)
                     COMPREPLY=($(compgen -W "--help" -- "$cur"))
                     return
                     ;;
@@ -168,6 +172,9 @@ _warp_wg() {
                                 devices)
                                     _arguments '(-j --json)'{-j,--json}'[Output as JSON]'
                                     ;;
+                                rotate-keys)
+                                    _arguments '(-q --quiet)'{-q,--quiet}'[Skip confirmation prompt]'
+                                    ;;
                             esac
                             ;;
                     esac
@@ -227,6 +234,9 @@ complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_see
 
 # registration devices flags
 complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from devices' -s j -l json -d 'Output as JSON'
+
+# registration rotate-keys flags
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from rotate-keys' -s q -l quiet -d 'Skip confirmation prompt'
 
 # profile flags
 complete -c warp-wg -n '__fish_seen_subcommand_from profile' -l no-ipv6 -d 'Exclude IPv6 addresses and DNS'

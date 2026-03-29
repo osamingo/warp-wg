@@ -80,6 +80,37 @@ func TestConfirmDelete(t *testing.T) {
 	}
 }
 
+func TestConfirmRotateKeys(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		input   string
+		wantErr bool
+	}{
+		{name: "success: accepts y", input: "y\n"},
+		{name: "success: accepts yes", input: "yes\n"},
+		{name: "error: rejects n", input: "n\n", wantErr: true},
+		{name: "error: rejects empty", input: "\n", wantErr: true},
+		{name: "error: empty reader (EOF)", input: "", wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			in := strings.NewReader(tt.input)
+			out := &bytes.Buffer{}
+
+			err := registration.ConfirmRotateKeys(in, out)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ConfirmRotateKeys() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestSystemLocale(t *testing.T) {
 	tests := []struct {
 		name string
