@@ -6,4 +6,6 @@ var (
 	ConfirmDelete = confirmDelete
 	SystemLocale  = systemLocale
 	PrintDevice   = printDevice
+	ExecShow      = execShow
+	ExecDevices   = execDevices
 )

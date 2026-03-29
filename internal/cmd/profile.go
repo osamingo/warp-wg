@@ -59,7 +59,7 @@ func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
 		return err
 	}
 
-	client := warp.NewClient()
+	client := warp.NewClientFromContext(ctx)
 	device, err := client.Device(ctx, acct.DeviceID, acct.AccessToken)
 	if err != nil {
 		return fmt.Errorf("fetching device info: %w", err)

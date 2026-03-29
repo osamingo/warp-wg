@@ -87,7 +87,7 @@ func execNew(ctx context.Context) error {
 
 	slog.Info("registering device with Cloudflare WARP")
 
-	client := warp.NewClient()
+	client := warp.NewClientFromContext(ctx)
 	resp, err := client.Register(ctx, &warp.RegisterRequest{
 		Key:       pubKey.String(),
 		InstallID: "",

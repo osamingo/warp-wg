@@ -49,6 +49,23 @@ func WithBaseURL(url string) Option {
 	}
 }
 
+type apiBaseURLKey struct{}
+
+// WithAPIBaseURL returns a context that carries a custom API base URL.
+func WithAPIBaseURL(ctx context.Context, url string) context.Context {
+	return context.WithValue(ctx, apiBaseURLKey{}, url)
+}
+
+// NewClientFromContext creates a new WARP API client, using the base URL
+// from context if set via WithAPIBaseURL.
+func NewClientFromContext(ctx context.Context) *Client {
+	var opts []Option
+	if url, ok := ctx.Value(apiBaseURLKey{}).(string); ok && url != "" {
+		opts = append(opts, WithBaseURL(url))
+	}
+	return NewClient(opts...)
+}
+
 // RegisterRequest is the request body for POST /reg.
 type RegisterRequest struct {
 	Key       string `json:"key"`
