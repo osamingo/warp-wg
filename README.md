@@ -39,6 +39,7 @@ warp-wg
 ├── registration
 │   ├── new           Register a new WARP device
 │   ├── show          Show current registration details
+│   ├── update        Update device registration settings
 │   ├── delete        Delete current device registration
 │   ├── license       Set a WARP+ license key
 │   ├── devices       List devices linked to the account
