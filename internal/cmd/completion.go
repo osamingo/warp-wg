@@ -49,7 +49,7 @@ const bashCompletion = `_warp_wg() {
     _init_completion || return
 
     local commands="registration profile status version completion"
-    local reg_commands="new show delete license devices rotate-keys"
+    local reg_commands="new show update delete license devices rotate-keys"
 
     case "${words[1]}" in
         registration)
@@ -68,6 +68,10 @@ const bashCompletion = `_warp_wg() {
                     ;;
                 devices)
                     COMPREPLY=($(compgen -W "--json -j --help" -- "$cur"))
+                    return
+                    ;;
+                update)
+                    COMPREPLY=($(compgen -W "--name --help" -- "$cur"))
                     return
                     ;;
                 license|rotate-keys)
@@ -121,6 +125,7 @@ _warp_wg() {
     reg_commands=(
         'new:Register a new WARP device'
         'show:Show current registration details'
+        'update:Update device registration settings'
         'delete:Delete current device registration'
         'license:Set a WARP+ license key'
         'devices:List devices linked to the account'
@@ -153,6 +158,9 @@ _warp_wg() {
                                     ;;
                                 show)
                                     _arguments '(-j --json)'{-j,--json}'[Output as JSON]'
+                                    ;;
+                                update)
+                                    _arguments '--name[Set device name]:name:'
                                     ;;
                                 delete)
                                     _arguments '(-q --quiet)'{-q,--quiet}'[Skip confirmation prompt]'
@@ -196,18 +204,22 @@ complete -c warp-wg -n '__fish_use_subcommand' -a version -d 'Print version info
 complete -c warp-wg -n '__fish_use_subcommand' -a completion -d 'Generate shell completion script'
 
 # registration subcommands
-complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show delete license devices rotate-keys' -a new -d 'Register a new WARP device'
-complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show delete license devices rotate-keys' -a show -d 'Show current registration details'
-complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show delete license devices rotate-keys' -a delete -d 'Delete current device registration'
-complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show delete license devices rotate-keys' -a license -d 'Set a WARP+ license key'
-complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show delete license devices rotate-keys' -a devices -d 'List devices linked to the account'
-complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show delete license devices rotate-keys' -a rotate-keys -d 'Generate a new key pair and update the registration'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a new -d 'Register a new WARP device'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a show -d 'Show current registration details'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a update -d 'Update device registration settings'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a delete -d 'Delete current device registration'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a license -d 'Set a WARP+ license key'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a devices -d 'List devices linked to the account'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish_seen_subcommand_from new show update delete license devices rotate-keys' -a rotate-keys -d 'Generate a new key pair and update the registration'
 
 # registration new flags
 complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from new' -l accept-tos -d 'Accept the Cloudflare Terms of Service'
 
 # registration show flags
 complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from show' -s j -l json -d 'Output as JSON'
+
+# registration update flags
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from update' -l name -d 'Set device name' -r
 
 # registration delete flags
 complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from delete' -s q -l quiet -d 'Skip confirmation prompt'

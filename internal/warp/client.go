@@ -138,7 +138,8 @@ type BoundDevice struct {
 
 // UpdateDeviceRequest is the request body for PATCH /reg/{deviceId}.
 type UpdateDeviceRequest struct {
-	Key string `json:"key"`
+	Key  string `json:"key,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 // UpdateAccountRequest is the request body for PUT /reg/{deviceId}/account.

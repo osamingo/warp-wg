@@ -74,6 +74,7 @@ func newRegistrationCmd(parentFlags *ff.FlagSet) *ff.Command {
 		Subcommands: []*ff.Command{
 			registration.NewNewCmd(flags),
 			registration.NewShowCmd(flags),
+			registration.NewUpdateCmd(flags),
 			registration.NewDeleteCmd(flags),
 			registration.NewLicenseCmd(flags),
 			registration.NewDevicesCmd(flags),
