@@ -35,7 +35,7 @@ func execLicense(ctx context.Context, licenseKey string) error {
 		return err
 	}
 
-	client := warp.NewClient()
+	client := warp.NewClientFromContext(ctx)
 	resp, err := client.UpdateAccount(ctx, acct.DeviceID, acct.AccessToken, &warp.UpdateAccountRequest{
 		License: licenseKey,
 	})

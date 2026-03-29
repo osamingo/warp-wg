@@ -68,7 +68,7 @@ func execDelete(ctx context.Context) error {
 
 	slog.Info("deleting device registration", slog.String("device_id", acct.DeviceID))
 
-	client := warp.NewClient()
+	client := warp.NewClientFromContext(ctx)
 	if err := client.DeleteDevice(ctx, acct.DeviceID, acct.AccessToken); err != nil {
 		return fmt.Errorf("deleting device: %w", err)
 	}

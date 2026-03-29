@@ -36,7 +36,7 @@ func execShow(ctx context.Context, out io.Writer, jsonOut bool) error {
 		return err
 	}
 
-	client := warp.NewClient()
+	client := warp.NewClientFromContext(ctx)
 	device, err := client.Device(ctx, acct.DeviceID, acct.AccessToken)
 	if err != nil {
 		return fmt.Errorf("fetching device info: %w", err)

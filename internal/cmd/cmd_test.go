@@ -3,14 +3,18 @@ package cmd_test
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/osamingo/warp-wg/internal/cmd"
+	"github.com/osamingo/warp-wg/internal/config"
+	"github.com/osamingo/warp-wg/internal/warp"
 )
 
 func TestPrintCompletion(t *testing.T) {
@@ -108,6 +112,125 @@ func TestPeerEndpoint(t *testing.T) {
 
 			if diff := cmp.Diff(tt.want, cmd.PeerEndpoint(tt.v4, tt.port)); diff != "" {
 				t.Errorf("PeerEndpoint() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestExecProfile(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		flags   cmd.ProfileFlags
+		handler http.HandlerFunc
+		wantErr bool
+		contain string
+	}{
+		{
+			name:  "success: generates profile with defaults",
+			flags: cmd.ProfileFlags{MTU: 1420, Port: "2408"},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(map[string]any{
+					"id": "device-123",
+					"account": map[string]any{
+						"id":           "acct-123",
+						"account_type": "free",
+					},
+					"config": map[string]any{
+						"client_id": "AQID",
+						"interface": map[string]any{
+							"addresses": map[string]string{
+								"v4": "172.16.0.2",
+								"v6": "fd01::1",
+							},
+						},
+						"peers": []map[string]any{{
+							"public_key": "server-pub-key",
+							"endpoint": map[string]string{
+								"host": "engage.cloudflareclient.com:2408",
+								"v4":   "162.159.192.1:0",
+							},
+						}},
+					},
+				})
+			},
+			contain: "Endpoint = engage.cloudflareclient.com:2408",
+		},
+		{
+			name:  "success: no-ipv6 excludes IPv6",
+			flags: cmd.ProfileFlags{NoIPv6: true, MTU: 1420, Port: "2408"},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(map[string]any{
+					"id":      "device-123",
+					"account": map[string]any{"account_type": "free"},
+					"config": map[string]any{
+						"interface": map[string]any{
+							"addresses": map[string]string{"v4": "172.16.0.2", "v6": "fd01::1"},
+						},
+						"peers": []map[string]any{{
+							"public_key": "key",
+							"endpoint":   map[string]string{"host": "host:2408", "v4": "1.2.3.4:0"},
+						}},
+					},
+				})
+			},
+			contain: "Address = 172.16.0.2/32\n",
+		},
+		{
+			name:  "success: endpoint-ip uses IP",
+			flags: cmd.ProfileFlags{UseIP: true, MTU: 1420, Port: "2408"},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(map[string]any{
+					"id":      "device-123",
+					"account": map[string]any{"account_type": "free"},
+					"config": map[string]any{
+						"interface": map[string]any{
+							"addresses": map[string]string{"v4": "172.16.0.2", "v6": "fd01::1"},
+						},
+						"peers": []map[string]any{{
+							"public_key": "key",
+							"endpoint":   map[string]string{"host": "host:2408", "v4": "162.159.192.1:0"},
+						}},
+					},
+				})
+			},
+			contain: "Endpoint = 162.159.192.1:2408",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			srv := httptest.NewServer(tt.handler)
+			defer srv.Close()
+
+			dir := t.TempDir()
+			ctx := context.Background()
+			ctx = config.WithPath(ctx, filepath.Join(dir, "account.toml"))
+			ctx = warp.WithAPIBaseURL(ctx, srv.URL)
+
+			acct := &config.Account{
+				DeviceID:    "device-123",
+				AccessToken: "token",
+				PrivateKey:  "YAnezg1qdTdRLGL7F+FPBnEuIc/6vmNPiPxP0GG2GA0=",
+			}
+			if err := config.Save(ctx, acct); err != nil {
+				t.Fatalf("Save() error = %v", err)
+			}
+
+			var buf bytes.Buffer
+			err := cmd.ExecProfile(ctx, &buf, tt.flags)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ExecProfile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && !strings.Contains(buf.String(), tt.contain) {
+				t.Errorf("ExecProfile() should contain %q, got:\n%s", tt.contain, buf.String())
 			}
 		})
 	}
