@@ -2,8 +2,10 @@ package config_test
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -315,4 +317,32 @@ func TestWithPath(t *testing.T) {
 	if diff := cmp.Diff(customPath, gotPath); diff != "" {
 		t.Errorf("FilePath() mismatch (-want +got):\n%s", diff)
 	}
+}
+
+func TestAccount_LogValue(t *testing.T) {
+	t.Parallel()
+
+	acct := &config.Account{
+		DeviceID:    "device-123",
+		AccessToken: "super-secret-token",
+		PrivateKey:  "super-secret-key",
+	}
+
+	logOutput := acct.LogValue().String()
+
+	if strings.Contains(logOutput, "super-secret-token") {
+		t.Error("LogValue() should not contain access token")
+	}
+	if strings.Contains(logOutput, "super-secret-key") {
+		t.Error("LogValue() should not contain private key")
+	}
+	if !strings.Contains(logOutput, "device-123") {
+		t.Error("LogValue() should contain device ID")
+	}
+	if !strings.Contains(logOutput, "[REDACTED]") {
+		t.Error("LogValue() should contain [REDACTED]")
+	}
+
+	// Verify it implements slog.LogValuer interface.
+	var _ slog.LogValuer = acct
 }

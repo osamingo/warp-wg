@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -29,6 +30,15 @@ type Account struct {
 	DeviceID    string `toml:"device_id"`
 	AccessToken string `toml:"access_token"`
 	PrivateKey  string `toml:"private_key"`
+}
+
+// LogValue implements slog.LogValuer to prevent secrets from being logged.
+func (a *Account) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("device_id", a.DeviceID),
+		slog.String("access_token", "[REDACTED]"),
+		slog.String("private_key", "[REDACTED]"),
+	)
 }
 
 type pathKey struct{}
