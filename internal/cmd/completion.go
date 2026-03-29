@@ -92,6 +92,10 @@ const bashCompletion = `_warp_wg() {
             return
             ;;
         *)
+            if [[ "$prev" == "--config" ]]; then
+                COMPREPLY=($(compgen -f -- "$cur"))
+                return
+            fi
             COMPREPLY=($(compgen -W "--config $commands" -- "$cur"))
             return
             ;;

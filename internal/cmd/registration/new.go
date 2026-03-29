@@ -107,6 +107,11 @@ func execNew(ctx context.Context) error {
 		PrivateKey:  privKey.String(),
 	}
 	if err := config.Save(ctx, acct); err != nil {
+		slog.Error("failed to save config, manually save the following credentials",
+			slog.String("device_id", resp.ID),
+			slog.String("access_token", resp.Token),
+			slog.String("private_key", privKey.String()),
+		)
 		return fmt.Errorf("saving config: %w", err)
 	}
 
