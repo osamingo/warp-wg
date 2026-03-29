@@ -28,7 +28,7 @@ func TestClient_Register(t *testing.T) {
 				if r.Method != http.MethodPost {
 					t.Errorf("method = %s, want POST", r.Method)
 				}
-				if want := "/v0a2158/reg"; r.URL.Path != want {
+				if want := "/v0a5101/reg"; r.URL.Path != want {
 					t.Errorf("path = %s, want %s", r.URL.Path, want)
 				}
 				if r.Header.Get("Content-Type") != "application/json" {
@@ -88,7 +88,7 @@ func TestClient_Device(t *testing.T) {
 				if r.Method != http.MethodGet {
 					t.Errorf("method = %s, want GET", r.Method)
 				}
-				if want := "/v0a2158/reg/device-123"; r.URL.Path != want {
+				if want := "/v0a5101/reg/device-123"; r.URL.Path != want {
 					t.Errorf("path = %s, want %s", r.URL.Path, want)
 				}
 				assertAuth(t, r, "test-token")
@@ -329,11 +329,11 @@ func TestAPIError(t *testing.T) {
 
 func assertCommonHeaders(t *testing.T, r *http.Request) {
 	t.Helper()
-	if r.Header.Get("User-Agent") != "okhttp/0.7.21" {
-		t.Errorf("User-Agent = %s, want okhttp/0.7.21", r.Header.Get("User-Agent"))
+	if r.Header.Get("User-Agent") != "okhttp/4.12.0" {
+		t.Errorf("User-Agent = %s, want okhttp/4.12.0", r.Header.Get("User-Agent"))
 	}
-	if r.Header.Get("CF-Client-Version") != "a-7.21-0721" {
-		t.Errorf("CF-Client-Version = %s, want a-7.21-0721", r.Header.Get("CF-Client-Version"))
+	if r.Header.Get("CF-Client-Version") != "a-6.38.6-5101" {
+		t.Errorf("CF-Client-Version = %s, want a-6.38.6-5101", r.Header.Get("CF-Client-Version"))
 	}
 }
 
