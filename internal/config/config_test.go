@@ -16,20 +16,20 @@ import (
 func TestSaveAndLoad(t *testing.T) {
 	tests := []struct {
 		name string
-		acct *config.Account
+		acct *config.Registration
 	}{
 		{
 			name: "success: saves and loads all fields",
-			acct: &config.Account{
-				DeviceID:    "test-device-id",
-				AccessToken: "test-access-token",
-				PrivateKey:  "YAnezg1qdTdRLGL7F+FPBnEuIc/6vmNPiPxP0GG2GA0=",
+			acct: &config.Registration{
+				RegistrationID: "test-device-id",
+				APIToken:       "test-access-token",
+				PrivateKey:     "YAnezg1qdTdRLGL7F+FPBnEuIc/6vmNPiPxP0GG2GA0=",
 			},
 		},
 		{
 			name: "success: saves and loads with empty fields",
-			acct: &config.Account{
-				DeviceID: "device-only",
+			acct: &config.Registration{
+				RegistrationID: "device-only",
 			},
 		},
 	}
@@ -59,23 +59,23 @@ func TestLoad(t *testing.T) {
 	tests := []struct {
 		name    string
 		setup   func(t *testing.T, dir string)
-		want    *config.Account
+		want    *config.Registration
 		wantErr bool
 	}{
 		{
 			name:  "success: returns empty account when file does not exist",
 			setup: func(t *testing.T, dir string) { t.Helper() },
-			want:  &config.Account{},
+			want:  &config.Registration{},
 		},
 		{
-			name: "error: returns error for invalid TOML",
+			name: "error: returns error for invalid JSON",
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
 				appDir := filepath.Join(dir, "warp-wg")
 				if err := os.MkdirAll(appDir, 0o700); err != nil {
 					t.Fatal(err)
 				}
-				if err := os.WriteFile(filepath.Join(appDir, "account.toml"), []byte("invalid[[[toml"), 0o600); err != nil {
+				if err := os.WriteFile(filepath.Join(appDir, "reg.json"), []byte("{invalid json}"), 0o600); err != nil {
 					t.Fatal(err)
 				}
 			},
@@ -105,52 +105,52 @@ func TestLoad(t *testing.T) {
 func TestLoad_EnvOverrides(t *testing.T) {
 	tests := []struct {
 		name string
-		file *config.Account
+		file *config.Registration
 		envs map[string]string
-		want *config.Account
+		want *config.Registration
 	}{
 		{
 			name: "success: environment variables override file values",
-			file: &config.Account{
-				DeviceID:    "file-device",
-				AccessToken: "file-token",
-				PrivateKey:  "file-key",
+			file: &config.Registration{
+				RegistrationID: "file-device",
+				APIToken:       "file-token",
+				PrivateKey:     "file-key",
 			},
 			envs: map[string]string{
-				"WARP_WG_DEVICE_ID":    "env-device",
-				"WARP_WG_ACCESS_TOKEN": "env-token",
-				"WARP_WG_PRIVATE_KEY":  "env-key",
+				"WARP_WG_REGISTRATION_ID": "env-device",
+				"WARP_WG_API_TOKEN":       "env-token",
+				"WARP_WG_PRIVATE_KEY":     "env-key",
 			},
-			want: &config.Account{
-				DeviceID:    "env-device",
-				AccessToken: "env-token",
-				PrivateKey:  "env-key",
+			want: &config.Registration{
+				RegistrationID: "env-device",
+				APIToken:       "env-token",
+				PrivateKey:     "env-key",
 			},
 		},
 		{
 			name: "success: partial override keeps file values",
-			file: &config.Account{
-				DeviceID:    "file-device",
-				AccessToken: "file-token",
-				PrivateKey:  "file-key",
+			file: &config.Registration{
+				RegistrationID: "file-device",
+				APIToken:       "file-token",
+				PrivateKey:     "file-key",
 			},
 			envs: map[string]string{
-				"WARP_WG_ACCESS_TOKEN": "env-token",
+				"WARP_WG_API_TOKEN": "env-token",
 			},
-			want: &config.Account{
-				DeviceID:    "file-device",
-				AccessToken: "env-token",
-				PrivateKey:  "file-key",
+			want: &config.Registration{
+				RegistrationID: "file-device",
+				APIToken:       "env-token",
+				PrivateKey:     "file-key",
 			},
 		},
 		{
 			name: "success: environment variables work without file",
 			file: nil,
 			envs: map[string]string{
-				"WARP_WG_DEVICE_ID": "env-device",
+				"WARP_WG_REGISTRATION_ID": "env-device",
 			},
-			want: &config.Account{
-				DeviceID: "env-device",
+			want: &config.Registration{
+				RegistrationID: "env-device",
 			},
 		},
 	}
@@ -186,12 +186,12 @@ func TestSave_CreatesDirectory(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "nested", "deep")
 	t.Setenv("XDG_CONFIG_HOME", dir)
 
-	acct := &config.Account{DeviceID: "test"}
+	acct := &config.Registration{RegistrationID: "test"}
 	if err := config.Save(context.Background(), acct); err != nil {
 		t.Fatalf("Save() error = %v", err)
 	}
 
-	path := filepath.Join(dir, "warp-wg", "account.toml")
+	path := filepath.Join(dir, "warp-wg", "reg.json")
 	if _, err := os.Stat(path); err != nil {
 		t.Errorf("config file should exist at %s: %v", path, err)
 	}
@@ -201,16 +201,16 @@ func TestSave_FilePermissions(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("XDG_CONFIG_HOME", dir)
 
-	acct := &config.Account{
-		DeviceID:    "test",
-		AccessToken: "secret-token",
-		PrivateKey:  "secret-key",
+	acct := &config.Registration{
+		RegistrationID: "test",
+		APIToken:       "secret-token",
+		PrivateKey:     "secret-key",
 	}
 	if err := config.Save(context.Background(), acct); err != nil {
 		t.Fatalf("Save() error = %v", err)
 	}
 
-	path := filepath.Join(dir, "warp-wg", "account.toml")
+	path := filepath.Join(dir, "warp-wg", "reg.json")
 	info, err := os.Stat(path)
 	if err != nil {
 		t.Fatalf("Stat() error = %v", err)
@@ -225,43 +225,43 @@ func TestSave_FilePermissions(t *testing.T) {
 func TestLoadRegistered(t *testing.T) {
 	tests := []struct {
 		name    string
-		acct    *config.Account
+		acct    *config.Registration
 		wantErr bool
 	}{
 		{
 			name: "success: all fields present",
-			acct: &config.Account{
-				DeviceID:    "device-id",
-				AccessToken: "token",
-				PrivateKey:  "key",
+			acct: &config.Registration{
+				RegistrationID: "device-id",
+				APIToken:       "token",
+				PrivateKey:     "key",
 			},
 		},
 		{
 			name:    "error: empty config",
-			acct:    &config.Account{},
+			acct:    &config.Registration{},
 			wantErr: true,
 		},
 		{
 			name: "error: missing access_token",
-			acct: &config.Account{
-				DeviceID:   "device-id",
-				PrivateKey: "key",
+			acct: &config.Registration{
+				RegistrationID: "device-id",
+				PrivateKey:     "key",
 			},
 			wantErr: true,
 		},
 		{
 			name: "error: missing private_key",
-			acct: &config.Account{
-				DeviceID:    "device-id",
-				AccessToken: "token",
+			acct: &config.Registration{
+				RegistrationID: "device-id",
+				APIToken:       "token",
 			},
 			wantErr: true,
 		},
 		{
 			name: "error: missing device_id",
-			acct: &config.Account{
-				AccessToken: "token",
-				PrivateKey:  "key",
+			acct: &config.Registration{
+				APIToken:   "token",
+				PrivateKey: "key",
 			},
 			wantErr: true,
 		},
@@ -292,10 +292,10 @@ func TestWithPath(t *testing.T) {
 	customPath := filepath.Join(t.TempDir(), "custom.toml")
 	ctx := config.WithPath(context.Background(), customPath)
 
-	acct := &config.Account{
-		DeviceID:    "test",
-		AccessToken: "token",
-		PrivateKey:  "key",
+	acct := &config.Registration{
+		RegistrationID: "test",
+		APIToken:       "token",
+		PrivateKey:     "key",
 	}
 	if err := config.Save(ctx, acct); err != nil {
 		t.Fatalf("Save() error = %v", err)
@@ -322,10 +322,10 @@ func TestWithPath(t *testing.T) {
 func TestAccount_LogValue(t *testing.T) {
 	t.Parallel()
 
-	acct := &config.Account{
-		DeviceID:    "device-123",
-		AccessToken: "super-secret-token",
-		PrivateKey:  "super-secret-key",
+	acct := &config.Registration{
+		RegistrationID: "device-123",
+		APIToken:       "super-secret-token",
+		PrivateKey:     "super-secret-key",
 	}
 
 	logOutput := acct.LogValue().String()

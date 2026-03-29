@@ -31,13 +31,13 @@ func NewShowCmd(parentFlags *ff.FlagSet) *ff.Command {
 }
 
 func execShow(ctx context.Context, out io.Writer, jsonOut bool) error {
-	acct, err := config.LoadRegistered(ctx)
+	reg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	device, err := client.Device(ctx, acct.DeviceID, acct.AccessToken)
+	device, err := client.Device(ctx, reg.RegistrationID, reg.APIToken)
 	if err != nil {
 		return fmt.Errorf("fetching device info: %w", err)
 	}

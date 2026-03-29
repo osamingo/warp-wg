@@ -274,10 +274,10 @@ func setupTestContext(t *testing.T, handler http.HandlerFunc) context.Context {
 	ctx = config.WithPath(ctx, filepath.Join(dir, "account.toml"))
 	ctx = warp.WithAPIBaseURL(ctx, srv.URL)
 
-	acct := &config.Account{
-		DeviceID:    "device-123",
-		AccessToken: "token",
-		PrivateKey:  "key",
+	acct := &config.Registration{
+		RegistrationID: "device-123",
+		APIToken:       "token",
+		PrivateKey:     "key",
 	}
 	if err := config.Save(ctx, acct); err != nil {
 		t.Fatalf("Save() error = %v", err)
