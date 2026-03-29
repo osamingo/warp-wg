@@ -75,7 +75,7 @@ func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
 	if pf.useIP {
 		endpoint = peerEndpoint(peer.Endpoint.V4, pf.port)
 	} else {
-		endpoint = net.JoinHostPort(peer.Endpoint.Host, pf.port)
+		endpoint = peerEndpoint(peer.Endpoint.Host, pf.port)
 	}
 
 	reserved, err := wireguard.ClientIDToReserved(device.Config.ClientID)
