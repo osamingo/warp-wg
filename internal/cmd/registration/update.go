@@ -37,13 +37,13 @@ func execUpdate(ctx context.Context, name string) error {
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	if _, err := client.UpdateDeviceKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateDeviceRequest{
+	if _, err := client.UpdateRegistrationKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateRegistrationRequest{
 		Name: name,
 	}); err != nil {
-		return fmt.Errorf("updating device: %w", err)
+		return fmt.Errorf("updating registration: %w", err)
 	}
 
-	slog.Info("device updated", slog.String("name", name))
+	slog.Info("registration updated", slog.String("name", name))
 
 	return nil
 }

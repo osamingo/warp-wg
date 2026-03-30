@@ -172,18 +172,18 @@ func TestSystemLocale(t *testing.T) {
 	}
 }
 
-func TestPrintDevice(t *testing.T) {
+func TestPrintRegistration(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name   string
-		device *warp.DeviceResponse
+		device *warp.RegistrationResponse
 		want   string
 	}{
 		{
 			name: "success: prints all fields including peer",
-			device: &warp.DeviceResponse{
-				ID: "test-device-id",
+			device: &warp.RegistrationResponse{
+				ID: "test-registration-id",
 				Account: warp.Account{
 					AccountType: "free",
 					PremiumData: 0,
@@ -213,20 +213,20 @@ func TestPrintDevice(t *testing.T) {
 					}},
 				},
 			},
-			want: "Device ID:    test-device-id\n" +
-				"Account Type: free\n" +
-				"Premium Data: 0 B\n" +
-				"Quota:        0 B\n" +
-				"Created:      2026-03-29T00:00:00Z\n" +
-				"Updated:      2026-03-29T00:00:00Z\n" +
-				"IPv4:         172.16.0.2\n" +
-				"IPv6:         fd01::1\n" +
-				"Endpoint:     engage.cloudflareclient.com\n" +
-				"Public Key:   server-pub-key\n",
+			want: "Registration ID:  test-registration-id\n" +
+				"Account Type:     free\n" +
+				"Premium Data:     0 B\n" +
+				"Quota:            0 B\n" +
+				"Created:          2026-03-29T00:00:00Z\n" +
+				"Updated:          2026-03-29T00:00:00Z\n" +
+				"IPv4:             172.16.0.2\n" +
+				"IPv6:             fd01::1\n" +
+				"Endpoint:         engage.cloudflareclient.com\n" +
+				"Public Key:       server-pub-key\n",
 		},
 		{
 			name: "success: omits peer fields when no peers",
-			device: &warp.DeviceResponse{
+			device: &warp.RegistrationResponse{
 				ID: "no-peers",
 				Account: warp.Account{
 					AccountType: "limited",
@@ -236,14 +236,14 @@ func TestPrintDevice(t *testing.T) {
 					Updated:     "2026-03-01T00:00:00Z",
 				},
 			},
-			want: "Device ID:    no-peers\n" +
-				"Account Type: limited\n" +
-				"Premium Data: 1.0 GiB\n" +
-				"Quota:        10 GiB\n" +
-				"Created:      2026-01-01T00:00:00Z\n" +
-				"Updated:      2026-03-01T00:00:00Z\n" +
-				"IPv4:         \n" +
-				"IPv6:         \n",
+			want: "Registration ID:  no-peers\n" +
+				"Account Type:     limited\n" +
+				"Premium Data:     1.0 GiB\n" +
+				"Quota:            10 GiB\n" +
+				"Created:          2026-01-01T00:00:00Z\n" +
+				"Updated:          2026-03-01T00:00:00Z\n" +
+				"IPv4:             \n" +
+				"IPv6:             \n",
 		},
 	}
 
@@ -252,12 +252,12 @@ func TestPrintDevice(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			if err := registration.PrintDevice(&buf, tt.device); err != nil {
-				t.Fatalf("PrintDevice() error = %v", err)
+			if err := registration.Print(&buf, tt.device); err != nil {
+				t.Fatalf("Print() error = %v", err)
 			}
 
 			if diff := cmp.Diff(tt.want, buf.String()); diff != "" {
-				t.Errorf("PrintDevice() mismatch (-want +got):\n%s", diff)
+				t.Errorf("Print() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
@@ -323,7 +323,7 @@ func TestExecShow(t *testing.T) {
 		{
 			name:    "success: text output",
 			jsonOut: false,
-			contain: "Device ID:    device-123",
+			contain: "Registration ID:  device-123",
 		},
 		{
 			name:    "success: json output",

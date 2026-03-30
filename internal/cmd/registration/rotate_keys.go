@@ -78,10 +78,10 @@ func execRotateKeys(ctx context.Context) error {
 	slog.Info("rotating WireGuard keys")
 
 	client := warp.NewClientFromContext(ctx)
-	if _, err := client.UpdateDeviceKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateDeviceRequest{
+	if _, err := client.UpdateRegistrationKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateRegistrationRequest{
 		Key: pubKey.String(),
 	}); err != nil {
-		return fmt.Errorf("updating device key: %w", err)
+		return fmt.Errorf("updating registration key: %w", err)
 	}
 
 	reg.PrivateKey = privKey.String()

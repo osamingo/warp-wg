@@ -21,7 +21,7 @@ func TestSaveAndLoad(t *testing.T) {
 		{
 			name: "success: saves and loads all fields",
 			acct: &config.Registration{
-				RegistrationID: "test-device-id",
+				RegistrationID: "test-registration-id",
 				APIToken:       "test-access-token",
 				PrivateKey:     "YAnezg1qdTdRLGL7F+FPBnEuIc/6vmNPiPxP0GG2GA0=",
 			},
@@ -29,7 +29,7 @@ func TestSaveAndLoad(t *testing.T) {
 		{
 			name: "success: saves and loads with empty fields",
 			acct: &config.Registration{
-				RegistrationID: "device-only",
+				RegistrationID: "registration-only",
 			},
 		},
 	}
@@ -231,7 +231,7 @@ func TestLoadRegistered(t *testing.T) {
 		{
 			name: "success: all fields present",
 			acct: &config.Registration{
-				RegistrationID: "device-id",
+				RegistrationID: "registration-id",
 				APIToken:       "token",
 				PrivateKey:     "key",
 			},
@@ -244,7 +244,7 @@ func TestLoadRegistered(t *testing.T) {
 		{
 			name: "error: missing access_token",
 			acct: &config.Registration{
-				RegistrationID: "device-id",
+				RegistrationID: "registration-id",
 				PrivateKey:     "key",
 			},
 			wantErr: true,
@@ -252,13 +252,13 @@ func TestLoadRegistered(t *testing.T) {
 		{
 			name: "error: missing private_key",
 			acct: &config.Registration{
-				RegistrationID: "device-id",
+				RegistrationID: "registration-id",
 				APIToken:       "token",
 			},
 			wantErr: true,
 		},
 		{
-			name: "error: missing device_id",
+			name: "error: missing registration_id",
 			acct: &config.Registration{
 				APIToken:   "token",
 				PrivateKey: "key",
@@ -323,7 +323,7 @@ func TestAccount_LogValue(t *testing.T) {
 	t.Parallel()
 
 	acct := &config.Registration{
-		RegistrationID: "device-123",
+		RegistrationID: "registration-123",
 		APIToken:       "super-secret-token",
 		PrivateKey:     "super-secret-key",
 	}
@@ -336,8 +336,8 @@ func TestAccount_LogValue(t *testing.T) {
 	if strings.Contains(logOutput, "super-secret-key") {
 		t.Error("LogValue() should not contain private key")
 	}
-	if !strings.Contains(logOutput, "device-123") {
-		t.Error("LogValue() should contain device ID")
+	if !strings.Contains(logOutput, "registration-123") {
+		t.Error("LogValue() should contain registration ID")
 	}
 	if !strings.Contains(logOutput, "[REDACTED]") {
 		t.Error("LogValue() should contain [REDACTED]")

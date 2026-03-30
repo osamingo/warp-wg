@@ -63,16 +63,16 @@ func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	device, err := client.Device(ctx, reg.RegistrationID, reg.APIToken)
+	registration, err := client.Registration(ctx, reg.RegistrationID, reg.APIToken)
 	if err != nil {
-		return fmt.Errorf("fetching device info: %w", err)
+		return fmt.Errorf("fetching registration info: %w", err)
 	}
 
-	if len(device.Config.Peers) == 0 {
-		return fmt.Errorf("no peers found in device config")
+	if len(registration.Config.Peers) == 0 {
+		return fmt.Errorf("no peers found in registration config")
 	}
 
-	peer := device.Config.Peers[0]
+	peer := registration.Config.Peers[0]
 
 	var endpoint string
 	if pf.useIP {
@@ -81,15 +81,15 @@ func execProfile(ctx context.Context, out io.Writer, pf profileFlags) error {
 		endpoint = peerEndpoint(peer.Endpoint.Host, pf.port)
 	}
 
-	reserved, err := wireguard.ClientIDToReserved(device.Config.ClientID)
+	reserved, err := wireguard.ClientIDToReserved(registration.Config.ClientID)
 	if err != nil {
 		return fmt.Errorf("converting client_id: %w", err)
 	}
 
 	data := wireguard.NewProfileData(
 		reg.PrivateKey,
-		device.Config.Interface.Addresses.V4,
-		device.Config.Interface.Addresses.V6,
+		registration.Config.Interface.Addresses.V4,
+		registration.Config.Interface.Addresses.V6,
 		peer.PublicKey,
 		endpoint,
 		reserved,

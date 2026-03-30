@@ -85,8 +85,8 @@ type RegisterResponse struct {
 	Config  DeviceConfig `json:"config"`
 }
 
-// DeviceResponse is the response from GET /reg/{deviceId}.
-type DeviceResponse struct {
+// RegistrationResponse is the response from GET /reg/{registrationId}.
+type RegistrationResponse struct {
 	ID      string       `json:"id"`
 	Account Account      `json:"account"`
 	Config  DeviceConfig `json:"config"`
@@ -136,13 +136,13 @@ type BoundDevice struct {
 	Activated string `json:"activated"`
 }
 
-// UpdateDeviceRequest is the request body for PATCH /reg/{deviceId}.
-type UpdateDeviceRequest struct {
+// UpdateRegistrationRequest is the request body for PATCH /reg/{registrationId}.
+type UpdateRegistrationRequest struct {
 	Key  string `json:"key,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
-// UpdateAccountRequest is the request body for PUT /reg/{deviceId}/account.
+// UpdateAccountRequest is the request body for PUT /reg/{registrationId}/account.
 type UpdateAccountRequest struct {
 	License string `json:"license"`
 }
@@ -156,32 +156,32 @@ func (c *Client) Register(ctx context.Context, req *RegisterRequest) (*RegisterR
 	return &resp, nil
 }
 
-// Device retrieves the device information for the given device ID.
-func (c *Client) Device(ctx context.Context, deviceID, token string) (*DeviceResponse, error) {
-	var resp DeviceResponse
-	if err := c.request(ctx, http.MethodGet, c.regDeviceURL(deviceID), authHeader(token), nil, &resp); err != nil {
+// Registration retrieves the registration information for the given registration ID.
+func (c *Client) Registration(ctx context.Context, registrationID, token string) (*RegistrationResponse, error) {
+	var resp RegistrationResponse
+	if err := c.request(ctx, http.MethodGet, c.regURL(registrationID), authHeader(token), nil, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
 }
 
-// DeleteDevice deletes the device registration.
-func (c *Client) DeleteDevice(ctx context.Context, deviceID, token string) error {
-	return c.request(ctx, http.MethodDelete, c.regDeviceURL(deviceID), authHeader(token), nil, nil)
+// DeleteRegistration deletes the registration.
+func (c *Client) DeleteRegistration(ctx context.Context, registrationID, token string) error {
+	return c.request(ctx, http.MethodDelete, c.regURL(registrationID), authHeader(token), nil, nil)
 }
 
-// UpdateDeviceKey updates the WireGuard public key for the device.
-func (c *Client) UpdateDeviceKey(ctx context.Context, deviceID, token string, req *UpdateDeviceRequest) (*DeviceResponse, error) {
-	var resp DeviceResponse
-	if err := c.request(ctx, http.MethodPatch, c.regDeviceURL(deviceID), authHeader(token), req, &resp); err != nil {
+// UpdateRegistrationKey updates the WireGuard public key for the registration.
+func (c *Client) UpdateRegistrationKey(ctx context.Context, registrationID, token string, req *UpdateRegistrationRequest) (*RegistrationResponse, error) {
+	var resp RegistrationResponse
+	if err := c.request(ctx, http.MethodPatch, c.regURL(registrationID), authHeader(token), req, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
 }
 
 // UpdateAccount updates the account license key.
-func (c *Client) UpdateAccount(ctx context.Context, deviceID, token string, req *UpdateAccountRequest) (*Account, error) {
-	url := c.regDeviceURL(deviceID) + "/account"
+func (c *Client) UpdateAccount(ctx context.Context, registrationID, token string, req *UpdateAccountRequest) (*Account, error) {
+	url := c.regURL(registrationID) + "/account"
 	var resp Account
 	if err := c.request(ctx, http.MethodPut, url, authHeader(token), req, &resp); err != nil {
 		return nil, err
@@ -190,8 +190,8 @@ func (c *Client) UpdateAccount(ctx context.Context, deviceID, token string, req 
 }
 
 // BoundDevices retrieves the list of devices linked to the account.
-func (c *Client) BoundDevices(ctx context.Context, deviceID, token string) ([]BoundDevice, error) {
-	url := c.regDeviceURL(deviceID) + "/account/devices"
+func (c *Client) BoundDevices(ctx context.Context, registrationID, token string) ([]BoundDevice, error) {
+	url := c.regURL(registrationID) + "/account/devices"
 	var resp []BoundDevice
 	if err := c.request(ctx, http.MethodGet, url, authHeader(token), nil, &resp); err != nil {
 		return nil, err
@@ -213,12 +213,12 @@ func (c *Client) regBaseURL() string {
 	return fmt.Sprintf("%s/%s/reg", c.baseURL, apiVersion)
 }
 
-func (c *Client) regDeviceURL(deviceID string) string {
-	// Validate deviceID to prevent path traversal or URL manipulation.
-	if strings.ContainsAny(deviceID, "/?#") {
-		return c.regBaseURL() + "/invalid-device-id"
+func (c *Client) regURL(registrationID string) string {
+	// Validate registrationID to prevent path traversal or URL manipulation.
+	if strings.ContainsAny(registrationID, "/?#") {
+		return c.regBaseURL() + "/invalid-registration-id"
 	}
-	return fmt.Sprintf("%s/%s/reg/%s", c.baseURL, apiVersion, deviceID)
+	return fmt.Sprintf("%s/%s/reg/%s", c.baseURL, apiVersion, registrationID)
 }
 
 func authHeader(token string) http.Header {
