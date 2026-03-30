@@ -119,7 +119,7 @@ func TestClient_Registration(t *testing.T) {
 			_, err := client.Registration(context.Background(), "device-123", "test-token")
 
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("Device() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("Registration() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -164,7 +164,7 @@ func TestClient_DeleteRegistration(t *testing.T) {
 			err := client.DeleteRegistration(context.Background(), "device-123", "test-token")
 
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("DeleteDevice() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("DeleteRegistration() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -209,7 +209,7 @@ func TestClient_UpdateRegistrationKey(t *testing.T) {
 			_, err := client.UpdateRegistrationKey(context.Background(), "device-123", "test-token", &warp.UpdateRegistrationRequest{Key: "new-public-key"})
 
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("UpdateDeviceKey() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("UpdateRegistrationKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
