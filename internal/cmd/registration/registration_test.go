@@ -183,7 +183,7 @@ func TestPrintRegistration(t *testing.T) {
 		{
 			name: "success: prints all fields including peer",
 			device: &warp.RegistrationResponse{
-				ID: "test-reg-id",
+				ID: "test-registration-id",
 				Account: warp.Account{
 					AccountType: "free",
 					PremiumData: 0,
@@ -213,7 +213,7 @@ func TestPrintRegistration(t *testing.T) {
 					}},
 				},
 			},
-			want: "Registration ID:  test-reg-id\n" +
+			want: "Registration ID:  test-registration-id\n" +
 				"Account Type:     free\n" +
 				"Premium Data:     0 B\n" +
 				"Quota:            0 B\n" +
