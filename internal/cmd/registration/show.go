@@ -31,30 +31,30 @@ func NewShowCmd(parentFlags *ff.FlagSet) *ff.Command {
 }
 
 func execShow(ctx context.Context, out io.Writer, jsonOut bool) error {
-	reg, err := config.LoadRegistered(ctx)
+	cfg, err := config.LoadRegistered(ctx)
 	if err != nil {
 		return err
 	}
 
 	client := warp.NewClientFromContext(ctx)
-	device, err := client.Device(ctx, reg.RegistrationID, reg.APIToken)
+	reg, err := client.Registration(ctx, cfg.RegistrationID, cfg.APIToken)
 	if err != nil {
-		return fmt.Errorf("fetching device info: %w", err)
+		return fmt.Errorf("fetching registration info: %w", err)
 	}
 
 	if jsonOut {
 		enc := json.NewEncoder(out)
 		enc.SetIndent("", "  ")
-		if err := enc.Encode(device); err != nil {
+		if err := enc.Encode(reg); err != nil {
 			return fmt.Errorf("encoding json: %w", err)
 		}
 		return nil
 	}
 
-	return printDevice(out, device)
+	return printRegistration(out, reg)
 }
 
-func printDevice(out io.Writer, d *warp.DeviceResponse) error {
+func printRegistration(out io.Writer, d *warp.RegistrationResponse) error {
 	lines := []struct{ label, value string }{
 		{"Registration ID", d.ID},
 		{"Account Type", d.Account.AccountType},

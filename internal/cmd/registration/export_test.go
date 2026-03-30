@@ -6,7 +6,7 @@ var (
 	ConfirmDelete     = confirmDelete
 	ConfirmRotateKeys = confirmRotateKeys
 	SystemLocale      = systemLocale
-	PrintDevice       = printDevice
+	PrintRegistration = printRegistration
 	ExecShow          = execShow
 	ExecDevices       = execDevices
 )

@@ -172,17 +172,17 @@ func TestSystemLocale(t *testing.T) {
 	}
 }
 
-func TestPrintDevice(t *testing.T) {
+func TestPrintRegistration(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name   string
-		device *warp.DeviceResponse
+		device *warp.RegistrationResponse
 		want   string
 	}{
 		{
 			name: "success: prints all fields including peer",
-			device: &warp.DeviceResponse{
+			device: &warp.RegistrationResponse{
 				ID: "test-reg-id",
 				Account: warp.Account{
 					AccountType: "free",
@@ -226,7 +226,7 @@ func TestPrintDevice(t *testing.T) {
 		},
 		{
 			name: "success: omits peer fields when no peers",
-			device: &warp.DeviceResponse{
+			device: &warp.RegistrationResponse{
 				ID: "no-peers",
 				Account: warp.Account{
 					AccountType: "limited",
@@ -252,12 +252,12 @@ func TestPrintDevice(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			if err := registration.PrintDevice(&buf, tt.device); err != nil {
-				t.Fatalf("PrintDevice() error = %v", err)
+			if err := registration.PrintRegistration(&buf, tt.device); err != nil {
+				t.Fatalf("PrintRegistration() error = %v", err)
 			}
 
 			if diff := cmp.Diff(tt.want, buf.String()); diff != "" {
-				t.Errorf("PrintDevice() mismatch (-want +got):\n%s", diff)
+				t.Errorf("PrintRegistration() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

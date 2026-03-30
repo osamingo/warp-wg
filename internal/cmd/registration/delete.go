@@ -69,8 +69,8 @@ func execDelete(ctx context.Context) error {
 	slog.Info("deleting device registration", slog.String("registration_id", reg.RegistrationID))
 
 	client := warp.NewClientFromContext(ctx)
-	if err := client.DeleteDevice(ctx, reg.RegistrationID, reg.APIToken); err != nil {
-		return fmt.Errorf("deleting device: %w", err)
+	if err := client.DeleteRegistration(ctx, reg.RegistrationID, reg.APIToken); err != nil {
+		return fmt.Errorf("deleting registration: %w", err)
 	}
 
 	cfgPath, err := config.FilePath(ctx)

@@ -74,7 +74,7 @@ func TestClient_Register(t *testing.T) {
 	}
 }
 
-func TestClient_Device(t *testing.T) {
+func TestClient_Registration(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -83,7 +83,7 @@ func TestClient_Device(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success: retrieves device info",
+			name: "success: retrieves registration info",
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != http.MethodGet {
 					t.Errorf("method = %s, want GET", r.Method)
@@ -95,7 +95,7 @@ func TestClient_Device(t *testing.T) {
 				assertCommonHeaders(t, r)
 
 				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(warp.DeviceResponse{ID: "device-123"})
+				json.NewEncoder(w).Encode(warp.RegistrationResponse{ID: "device-123"})
 			},
 		},
 		{
@@ -116,7 +116,7 @@ func TestClient_Device(t *testing.T) {
 			defer srv.Close()
 
 			client := warp.NewClient(warp.WithBaseURL(srv.URL))
-			_, err := client.Device(context.Background(), "device-123", "test-token")
+			_, err := client.Registration(context.Background(), "device-123", "test-token")
 
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Device() error = %v, wantErr %v", err, tt.wantErr)
@@ -125,7 +125,7 @@ func TestClient_Device(t *testing.T) {
 	}
 }
 
-func TestClient_DeleteDevice(t *testing.T) {
+func TestClient_DeleteRegistration(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -134,7 +134,7 @@ func TestClient_DeleteDevice(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success: deletes device",
+			name: "success: deletes registration",
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != http.MethodDelete {
 					t.Errorf("method = %s, want DELETE", r.Method)
@@ -161,7 +161,7 @@ func TestClient_DeleteDevice(t *testing.T) {
 			defer srv.Close()
 
 			client := warp.NewClient(warp.WithBaseURL(srv.URL))
-			err := client.DeleteDevice(context.Background(), "device-123", "test-token")
+			err := client.DeleteRegistration(context.Background(), "device-123", "test-token")
 
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("DeleteDevice() error = %v, wantErr %v", err, tt.wantErr)
@@ -170,7 +170,7 @@ func TestClient_DeleteDevice(t *testing.T) {
 	}
 }
 
-func TestClient_UpdateDeviceKey(t *testing.T) {
+func TestClient_UpdateRegistrationKey(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -179,21 +179,21 @@ func TestClient_UpdateDeviceKey(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success: updates device key",
+			name: "success: updates registration key",
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != http.MethodPatch {
 					t.Errorf("method = %s, want PATCH", r.Method)
 				}
 				assertAuth(t, r, "test-token")
 
-				var req warp.UpdateDeviceRequest
+				var req warp.UpdateRegistrationRequest
 				json.NewDecoder(r.Body).Decode(&req)
 				if req.Key != "new-public-key" {
 					t.Errorf("key = %s, want new-public-key", req.Key)
 				}
 
 				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(warp.DeviceResponse{ID: "device-123"})
+				json.NewEncoder(w).Encode(warp.RegistrationResponse{ID: "device-123"})
 			},
 		},
 	}
@@ -206,7 +206,7 @@ func TestClient_UpdateDeviceKey(t *testing.T) {
 			defer srv.Close()
 
 			client := warp.NewClient(warp.WithBaseURL(srv.URL))
-			_, err := client.UpdateDeviceKey(context.Background(), "device-123", "test-token", &warp.UpdateDeviceRequest{Key: "new-public-key"})
+			_, err := client.UpdateRegistrationKey(context.Background(), "device-123", "test-token", &warp.UpdateRegistrationRequest{Key: "new-public-key"})
 
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("UpdateDeviceKey() error = %v, wantErr %v", err, tt.wantErr)
@@ -316,7 +316,7 @@ func TestAPIError(t *testing.T) {
 	defer srv.Close()
 
 	client := warp.NewClient(warp.WithBaseURL(srv.URL))
-	_, err := client.Device(context.Background(), "x", "t")
+	_, err := client.Registration(context.Background(), "x", "t")
 
 	var apiErr *warp.APIError
 	if !errors.As(err, &apiErr) {
