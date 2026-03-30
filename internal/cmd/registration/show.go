@@ -51,10 +51,10 @@ func execShow(ctx context.Context, out io.Writer, jsonOut bool) error {
 		return nil
 	}
 
-	return printRegistration(out, reg)
+	return printReg(out, reg)
 }
 
-func printRegistration(out io.Writer, d *warp.RegistrationResponse) error {
+func printReg(out io.Writer, d *warp.RegistrationResponse) error {
 	lines := []struct{ label, value string }{
 		{"Registration ID", d.ID},
 		{"Account Type", d.Account.AccountType},
