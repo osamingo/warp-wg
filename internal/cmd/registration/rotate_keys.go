@@ -53,7 +53,7 @@ func confirmRotateKeys(in io.Reader, out io.Writer) error {
 
 	answer := strings.TrimSpace(strings.ToLower(scanner.Text()))
 	if answer != "y" && answer != "yes" {
-		return errors.New("aborted")
+		return errors.New("operation cancelled by user")
 	}
 
 	return nil
@@ -75,7 +75,7 @@ func execRotateKeys(ctx context.Context) error {
 		return fmt.Errorf("deriving public key: %w", err)
 	}
 
-	slog.Info("rotating WireGuard keys")
+	slog.Info("Rotating WireGuard keys...")
 
 	client := warp.NewClientFromContext(ctx)
 	if _, err := client.UpdateRegistrationKey(ctx, reg.RegistrationID, reg.APIToken, &warp.UpdateRegistrationRequest{
@@ -86,13 +86,13 @@ func execRotateKeys(ctx context.Context) error {
 
 	reg.PrivateKey = privKey.String()
 	if err := config.Save(ctx, reg); err != nil {
-		slog.Error("failed to save config, manually save the following credentials",
+		slog.Error("Failed to save config, manually save the following credentials",
 			slog.String("private_key", privKey.String()),
 		)
 		return fmt.Errorf("remote key was updated but local config save failed, re-register may be required: %w", err)
 	}
 
-	slog.Info("keys rotated successfully")
+	slog.Info("Keys rotated successfully")
 
 	return nil
 }

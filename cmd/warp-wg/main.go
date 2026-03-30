@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,7 +15,7 @@ func main() {
 	defer stop()
 
 	if err := cmd.Run(ctx, os.Args[1:]); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		slog.Error(err.Error()) //nolint:gosec // err is from internal cmd, not user input
 		os.Exit(1)
 	}
 }

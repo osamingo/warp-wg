@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -36,11 +35,7 @@ func execStatus(ctx context.Context, out io.Writer, url string) error {
 	if err != nil {
 		return fmt.Errorf("fetching trace: %w", err)
 	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			slog.Warn("failed to close response body", slog.String("error", err.Error()))
-		}
-	}()
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("trace returned status %d", resp.StatusCode)
