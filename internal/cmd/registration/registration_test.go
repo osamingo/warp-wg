@@ -252,12 +252,12 @@ func TestPrintRegistration(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			if err := registration.PrintRegistration(&buf, tt.device); err != nil {
-				t.Fatalf("PrintRegistration() error = %v", err)
+			if err := registration.Print(&buf, tt.device); err != nil {
+				t.Fatalf("Print() error = %v", err)
 			}
 
 			if diff := cmp.Diff(tt.want, buf.String()); diff != "" {
-				t.Errorf("PrintRegistration() mismatch (-want +got):\n%s", diff)
+				t.Errorf("Print() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
