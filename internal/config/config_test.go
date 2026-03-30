@@ -258,7 +258,7 @@ func TestLoadRegistered(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "error: missing device_id",
+			name: "error: missing registration_id",
 			acct: &config.Registration{
 				APIToken:   "token",
 				PrivateKey: "key",
@@ -337,7 +337,7 @@ func TestAccount_LogValue(t *testing.T) {
 		t.Error("LogValue() should not contain private key")
 	}
 	if !strings.Contains(logOutput, "device-123") {
-		t.Error("LogValue() should contain device ID")
+		t.Error("LogValue() should contain registration ID")
 	}
 	if !strings.Contains(logOutput, "[REDACTED]") {
 		t.Error("LogValue() should contain [REDACTED]")

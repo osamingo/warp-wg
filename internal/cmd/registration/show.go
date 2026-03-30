@@ -56,7 +56,7 @@ func execShow(ctx context.Context, out io.Writer, jsonOut bool) error {
 
 func printDevice(out io.Writer, d *warp.DeviceResponse) error {
 	lines := []struct{ label, value string }{
-		{"Device ID", d.ID},
+		{"Registration ID", d.ID},
 		{"Account Type", d.Account.AccountType},
 		{"Premium Data", humanize.IBytes(d.Account.PremiumData)},
 		{"Quota", humanize.IBytes(d.Account.Quota)},
@@ -75,7 +75,7 @@ func printDevice(out io.Writer, d *warp.DeviceResponse) error {
 	}
 
 	for _, l := range lines {
-		if _, err := fmt.Fprintf(out, "%-14s%s\n", l.label+":", l.value); err != nil {
+		if _, err := fmt.Fprintf(out, "%-18s%s\n", l.label+":", l.value); err != nil {
 			return fmt.Errorf("writing output: %w", err)
 		}
 	}
