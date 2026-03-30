@@ -86,7 +86,7 @@ func execNew(ctx context.Context, model string) error {
 		return fmt.Errorf("deriving public key: %w", err)
 	}
 
-	slog.Info("registering device with Cloudflare WARP")
+	slog.Info("Registering with Cloudflare WARP...")
 
 	client := warp.NewClientFromContext(ctx)
 	resp, err := client.Register(ctx, &warp.RegisterRequest{
@@ -108,7 +108,7 @@ func execNew(ctx context.Context, model string) error {
 		PrivateKey:     privKey.String(),
 	}
 	if err := config.Save(ctx, reg); err != nil {
-		slog.Error("failed to save config, manually save the following credentials",
+		slog.Error("Failed to save config, manually save the following credentials",
 			slog.String("registration_id", resp.ID),
 			slog.String("api_token", resp.Token),
 			slog.String("private_key", privKey.String()),
@@ -116,7 +116,7 @@ func execNew(ctx context.Context, model string) error {
 		return fmt.Errorf("saving config: %w", err)
 	}
 
-	slog.Info("registration successful",
+	slog.Info("Registration successful",
 		slog.String("registration_id", resp.ID),
 		slog.String("account_type", resp.Account.AccountType),
 	)

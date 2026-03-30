@@ -43,7 +43,7 @@ func execUpdate(ctx context.Context, name string) error {
 		return fmt.Errorf("updating registration: %w", err)
 	}
 
-	slog.Info("registration updated", slog.String("name", name))
+	slog.Info("Registration updated", slog.String("name", name))
 
 	return nil
 }

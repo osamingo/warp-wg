@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"runtime/debug"
 
@@ -12,6 +13,7 @@ import (
 
 	"github.com/osamingo/warp-wg/internal/cmd/registration"
 	"github.com/osamingo/warp-wg/internal/config"
+	applog "github.com/osamingo/warp-wg/internal/log"
 )
 
 var version = "dev"
@@ -26,6 +28,8 @@ func init() {
 }
 
 func Run(ctx context.Context, args []string) error {
+	slog.SetDefault(slog.New(applog.NewHandler()))
+
 	rootFlags := ff.NewFlagSet("warp-wg")
 	configPath := rootFlags.StringLong("config", "", "Path to config file")
 

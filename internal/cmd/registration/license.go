@@ -15,18 +15,19 @@ import (
 func NewLicenseCmd(parentFlags *ff.FlagSet) *ff.Command {
 	flags := ff.NewFlagSet("license").SetParent(parentFlags)
 
-	return &ff.Command{
+	cmd := &ff.Command{
 		Name:      "license",
 		Usage:     "warp-wg registration license <KEY>",
 		ShortHelp: "Set a WARP+ license key",
 		Flags:     flags,
-		Exec: func(ctx context.Context, args []string) error {
-			if len(args) != 1 {
-				return fmt.Errorf("usage: warp-wg registration license <KEY>")
-			}
-			return execLicense(ctx, args[0])
-		},
 	}
+	cmd.Exec = func(ctx context.Context, args []string) error {
+		if len(args) != 1 {
+			return fmt.Errorf("expected one argument: license key")
+		}
+		return execLicense(ctx, args[0])
+	}
+	return cmd
 }
 
 func execLicense(ctx context.Context, licenseKey string) error {
@@ -43,9 +44,7 @@ func execLicense(ctx context.Context, licenseKey string) error {
 		return fmt.Errorf("updating license: %w", err)
 	}
 
-	slog.Info("license updated",
-		slog.String("account_type", resp.AccountType),
-	)
+	slog.Info("License updated", slog.String("account_type", resp.AccountType))
 
 	return nil
 }

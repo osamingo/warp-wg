@@ -40,7 +40,7 @@ Restart your shell after setup for completions to take effect.`,
 		}
 
 		if len(args) != 1 {
-			return fmt.Errorf("usage: warp-wg completion <bash|zsh|fish>")
+			return fmt.Errorf("expected one argument: bash, zsh, or fish")
 		}
 
 		return printCompletion(os.Stdout, args[0])

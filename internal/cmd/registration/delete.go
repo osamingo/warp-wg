@@ -54,7 +54,7 @@ func confirmDelete(in io.Reader, out io.Writer) error {
 
 	answer := strings.TrimSpace(strings.ToLower(scanner.Text()))
 	if answer != "y" && answer != "yes" {
-		return errors.New("aborted")
+		return errors.New("operation cancelled by user")
 	}
 
 	return nil
@@ -66,7 +66,7 @@ func execDelete(ctx context.Context) error {
 		return err
 	}
 
-	slog.Info("deleting device registration", slog.String("registration_id", reg.RegistrationID))
+	slog.Info("Deleting registration...", slog.String("registration_id", reg.RegistrationID))
 
 	client := warp.NewClientFromContext(ctx)
 	if err := client.DeleteRegistration(ctx, reg.RegistrationID, reg.APIToken); err != nil {
@@ -81,9 +81,9 @@ func execDelete(ctx context.Context) error {
 		return fmt.Errorf("removing config file: %w", err)
 	}
 
-	os.Remove(filepath.Dir(cfgPath)) //nolint:errcheck,gosec // best-effort cleanup, directory may not be empty
+	os.Remove(filepath.Dir(cfgPath)) //nolint:gosec // best-effort cleanup, directory may not be empty
 
-	slog.Info("registration deleted")
+	slog.Info("Registration deleted")
 
 	return nil
 }

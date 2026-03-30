@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -256,11 +255,7 @@ func (c *Client) request(ctx context.Context, method, url string, headers http.H
 	if err != nil {
 		return fmt.Errorf("sending request: %w", err)
 	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			slog.Warn("failed to close response body", slog.String("error", err.Error()))
-		}
-	}()
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseSize))
 	if err != nil {
