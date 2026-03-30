@@ -14,6 +14,23 @@ func newCompletionCmd() *ff.Command {
 		Name:      "completion",
 		Usage:     "warp-wg completion <bash|zsh|fish>",
 		ShortHelp: "Generate shell completion script",
+		LongHelp: `Generate a shell completion script for the specified shell.
+
+Setup:
+
+  Bash
+    Add the following to ~/.bashrc:
+      eval "$(warp-wg completion bash)"
+
+  Zsh
+    Add the following to ~/.zshrc:
+      eval "$(warp-wg completion zsh)"
+
+  Fish
+    Run the following command:
+      warp-wg completion fish > ~/.config/fish/completions/warp-wg.fish
+
+Restart your shell after setup for completions to take effect.`,
 		Exec: func(_ context.Context, args []string) error {
 			if len(args) != 1 {
 				return fmt.Errorf("usage: warp-wg completion <bash|zsh|fish>")

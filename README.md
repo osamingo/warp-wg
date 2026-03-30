@@ -52,17 +52,7 @@ warp-wg
 
 ## Shell Completion
 
-```bash
-# bash (add to ~/.bashrc)
-eval "$(warp-wg completion bash)"
-
-# zsh (add to ~/.zshrc)
-eval "$(warp-wg completion zsh)"
-
-# fish
-warp-wg completion fish | source
-warp-wg completion fish > ~/.config/fish/completions/warp-wg.fish  # persistent
-```
+See `warp-wg completion -h/--help` for setup instructions.
 
 ## Configuration
 
