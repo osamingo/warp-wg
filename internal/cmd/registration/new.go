@@ -24,10 +24,11 @@ const tosURL = "https://www.cloudflare.com/application/terms/"
 func NewNewCmd(parentFlags *ff.FlagSet) *ff.Command {
 	flags := ff.NewFlagSet("new").SetParent(parentFlags)
 	acceptTos := flags.Bool(0, "accept-tos", "Accept the Cloudflare Terms of Service without prompting")
+	modelFlag := flags.String('m', "model", "Pixel 8", "Device model name sent to the API")
 
 	return &ff.Command{
 		Name:      "new",
-		Usage:     "warp-wg registration new [--accept-tos]",
+		Usage:     "warp-wg registration new [--accept-tos] [--model <name>]",
 		ShortHelp: "Register a new WARP device",
 		Flags:     flags,
 		Exec: func(ctx context.Context, _ []string) error {
@@ -36,7 +37,7 @@ func NewNewCmd(parentFlags *ff.FlagSet) *ff.Command {
 					return err
 				}
 			}
-			return execNew(ctx)
+			return execNew(ctx, *modelFlag)
 		},
 	}
 }
@@ -66,7 +67,7 @@ func promptTOS(in io.Reader, out io.Writer) error {
 	return nil
 }
 
-func execNew(ctx context.Context) error {
+func execNew(ctx context.Context, model string) error {
 	reg, err := config.Load(ctx)
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
@@ -93,7 +94,7 @@ func execNew(ctx context.Context) error {
 		InstallID:    "",
 		FcmToken:     "",
 		TOS:          time.Now().UTC().Format(time.RFC3339),
-		Model:        "PC",
+		Model:        model,
 		SerialNumber: "",
 		Locale:       systemLocale(),
 	})
