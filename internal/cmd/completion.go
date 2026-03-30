@@ -72,7 +72,7 @@ const bashCompletion = `_warp_wg() {
         registration)
             case "${words[2]}" in
                 new)
-                    COMPREPLY=($(compgen -W "--accept-tos --help" -- "$cur"))
+                    COMPREPLY=($(compgen -W "--accept-tos --model -m --help" -- "$cur"))
                     return
                     ;;
                 show)
@@ -175,7 +175,9 @@ _warp_wg() {
                         subargs)
                             case ${words[1]} in
                                 new)
-                                    _arguments '--accept-tos[Accept the Cloudflare Terms of Service]'
+                                    _arguments \
+                                        '--accept-tos[Accept the Cloudflare Terms of Service]' \
+                                        '(-m --model)'{-m,--model}'[Device model name sent to the API]:model:'
                                     ;;
                                 show)
                                     _arguments '(-j --json)'{-j,--json}'[Output as JSON]'
@@ -239,6 +241,7 @@ complete -c warp-wg -n '__fish_seen_subcommand_from registration; and not __fish
 
 # registration new flags
 complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from new' -l accept-tos -d 'Accept the Cloudflare Terms of Service'
+complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from new' -s m -l model -d 'Device model name sent to the API' -r
 
 # registration show flags
 complete -c warp-wg -n '__fish_seen_subcommand_from registration; and __fish_seen_subcommand_from show' -s j -l json -d 'Output as JSON'
