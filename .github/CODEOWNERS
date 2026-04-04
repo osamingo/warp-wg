@@ -1,0 +1,5 @@
+# Default owner for everything
+* @osamingo
+
+# CI/CD and infrastructure (security-critical)
+/.github/ @osamingo
