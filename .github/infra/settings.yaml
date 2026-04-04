@@ -1,0 +1,74 @@
+apiVersion: gh-infra/v1
+kind: Repository
+metadata:
+  owner: osamingo
+  name: warp-wg
+spec:
+  description: "Unofficial CLI for generating WireGuard profiles from Cloudflare WARP"
+  visibility: public
+  topics:
+    - cli
+    - cloudflare-warp
+    - go
+    - wireguard
+  features:
+    issues: true
+    wiki: false
+    projects: false
+    discussions: false
+  merge_strategy:
+    allow_merge_commit: false
+    allow_squash_merge: true
+    allow_rebase_merge: false
+    auto_delete_head_branches: true
+    squash_merge_commit_title: PR_TITLE
+    squash_merge_commit_message: PR_BODY
+  rulesets:
+    - name: main
+      target: branch
+      enforcement: active
+      bypass_actors:
+        - role: admin
+          bypass_mode: pull_request
+      conditions:
+        ref_name:
+          include:
+            - "refs/heads/main"
+      rules:
+        pull_request:
+          required_approving_review_count: 1
+          dismiss_stale_reviews_on_push: true
+          require_code_owner_review: true
+          require_last_push_approval: true
+          required_review_thread_resolution: true
+        required_status_checks:
+          strict_required_status_checks_policy: true
+          contexts:
+            - context: test
+            - context: lint
+        non_fast_forward: true
+        deletion: true
+        required_linear_history: true
+        required_signatures: true
+    - name: tags
+      target: tag
+      enforcement: active
+      conditions:
+        ref_name:
+          include:
+            - "refs/tags/v*"
+      rules:
+        deletion: true
+        non_fast_forward: true
+    - name: tag-creation
+      target: tag
+      enforcement: active
+      bypass_actors:
+        - role: admin
+          bypass_mode: always
+      conditions:
+        ref_name:
+          include:
+            - "refs/tags/v*"
+      rules:
+        creation: true
